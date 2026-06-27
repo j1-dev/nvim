@@ -42,21 +42,75 @@ vim.pack.add({
   -- Integrated terminal (toggleable, like VS Code's panel)
   'https://github.com/akinsho/toggleterm.nvim',
 
-  -- A pleasant colorscheme
+  -- Rainbow brackets (VS Code-style bracket pair colorization)
+  'https://github.com/HiPhish/rainbow-delimiters.nvim',
+
+  -- Indent guides (vertical lines marking indentation levels)
+  'https://github.com/lukas-reineke/indent-blankline.nvim',
+
+  -- Colorscheme collection (switch any time with <leader>ut)
   'https://github.com/catppuccin/nvim',
+  'https://github.com/folke/tokyonight.nvim',
+  'https://github.com/rose-pine/neovim',
+  'https://github.com/rebelot/kanagawa.nvim',
+  'https://github.com/ellisonleao/gruvbox.nvim',
+  'https://github.com/EdenEast/nightfox.nvim',
+  'https://github.com/sainnhe/everforest',
+  'https://github.com/Mofiqul/vscode.nvim',
+  'https://github.com/navarasu/onedark.nvim',
+  'https://github.com/Mofiqul/dracula.nvim',
+  'https://github.com/shaunsingh/nord.nvim',
+  'https://github.com/savq/melange-nvim',
+  'https://github.com/projekt0n/github-nvim-theme',
+  'https://github.com/AlexvZyl/nordic.nvim',
+  'https://github.com/marko-cerovac/material.nvim',
+  'https://github.com/nyoom-engineering/oxocarbon.nvim',
+  'https://github.com/bluz71/vim-moonfly-colors',
 
   -- Custom start screen / dashboard
   'https://github.com/goolord/alpha-nvim',
 })
 
 -- ---------------------------------------------------------------------------
--- Colorscheme
+-- Colorscheme + theme selector
 -- ---------------------------------------------------------------------------
 require('catppuccin').setup({
   flavour = 'mocha',
   term_colors = true, -- give the built-in terminal a readable ANSI palette
 })
-vim.cmd.colorscheme('catppuccin')
+
+-- Persist the chosen colorscheme across restarts.
+local theme_file = vim.fn.stdpath('data') .. '/last-colorscheme'
+local default_theme = 'dark2026'
+
+-- Apply the last-used theme (or the default on a fresh install).
+local function load_saved_theme()
+  local name = default_theme
+  local f = io.open(theme_file, 'r')
+  if f then
+    local saved = vim.trim(f:read('*a') or '')
+    f:close()
+    if saved ~= '' then name = saved end
+  end
+  pcall(vim.cmd.colorscheme, name)
+end
+load_saved_theme()
+
+-- Remember the theme whenever it changes (e.g. picked via the selector).
+vim.api.nvim_create_autocmd('ColorScheme', {
+  desc = 'Persist the selected colorscheme',
+  callback = function(args)
+    local f = io.open(theme_file, 'w')
+    if f then
+      f:write(args.match or '')
+      f:close()
+    end
+  end,
+})
+
+-- Theme selector: live-preview picker of all installed colorschemes.
+vim.keymap.set('n', '<leader>ut', '<cmd>FzfLua colorschemes<CR>', { desc = 'Choose colorscheme' })
+vim.api.nvim_create_user_command('Themes', '<cmd>FzfLua colorschemes<CR>', { desc = 'Choose colorscheme' })
 
 -- ---------------------------------------------------------------------------
 -- Start screen (alpha-nvim) — custom "J" splash instead of the default N logo
@@ -177,6 +231,24 @@ vim.api.nvim_create_autocmd('FileType', {
       vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end
   end,
+})
+
+-- Rainbow brackets: color () [] {} by nesting depth, like VS Code's bracket
+-- pair colorization. The cycle (gold -> orchid -> blue) is defined by these
+-- highlight groups (set to VS Code's defaults in the dark2026 colorscheme).
+vim.g.rainbow_delimiters = {
+  highlight = {
+    'RainbowDelimiterYellow', -- depth 0: gold
+    'RainbowDelimiterViolet', -- depth 1: orchid
+    'RainbowDelimiterBlue',   -- depth 2: blue
+  },
+}
+
+-- Indent guides: thin vertical lines at each indentation level (VS Code style).
+-- Line color is set by the IblIndent highlight (dark2026 sets it to #404040).
+require('ibl').setup({
+  indent = { char = '│' },
+  scope = { enabled = false }, -- keep guides uniform, no highlighted scope block
 })
 
 -- ---------------------------------------------------------------------------

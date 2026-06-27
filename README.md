@@ -18,6 +18,11 @@ auto-install on first launch.
 - **Integrated terminal** (`toggleterm`) — toggle a shell with `<C-\>`
 - **Custom start screen** (`alpha-nvim`) with a "J" splash + quick actions
 - **Catppuccin (mocha)** colorscheme with a readable terminal palette
+- **Theme selector** — live-preview picker (`<leader>ut`) across 18 themes; your
+  choice is remembered across restarts. Includes a custom **dark2026** theme
+  (recreated from VS Code Insiders' "Dark 2026"), which is the default.
+- **Rainbow brackets** — `()`/`[]`/`{}` colored by nesting depth (VS Code-style)
+- **Indent guides** — vertical lines marking indentation levels (`indent-blankline`)
 - **Mason** auto-installs all tooling, **pinned plugin versions** via lock file
 
 ## Requirements
@@ -124,6 +129,7 @@ Leader is `<Space>`.
 | `gra`          | Code action                     |
 | `K`            | Hover docs                      |
 | `<leader>e`    | Show diagnostic float           |
+| `<leader>ut`   | Choose colorscheme (live preview) |
 | `<leader>th`   | Toggle inlay hints              |
 | `]c` / `[c`    | Next / previous git hunk        |
 | `<leader>gs`   | Stage hunk                      |
