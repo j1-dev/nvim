@@ -13,7 +13,7 @@ auto-install on first launch.
 - **Treesitter** syntax highlighting & indentation (nvim-treesitter `main` branch)
 - **Formatting** with Prettier (`prettierd`/`prettier`) — format on save
 - **Fuzzy finding** with `fzf-lua`
-- **Git** signs + hunk actions via `gitsigns`
+- **Git** signs + hunk actions via `gitsigns`, plus **LazyGit** full TUI (`<leader>gg`)
 - **File explorer** sidebar (`neo-tree`) on the right — VS Code style
 - **Integrated terminal** (`toggleterm`) — toggle a shell with `<C-\>`
 - **Custom start screen** (`alpha-nvim`) with a "J" splash + quick actions
@@ -36,6 +36,7 @@ On any machine you install this on, you need:
 - **gcc/clang + make** (compiler toolchain for building Treesitter parsers)
 - The `tree-sitter` CLI is installed automatically via Mason (no manual step)
 - **fzf** is installed automatically by `install.sh` if missing (to `~/.local/bin`)
+- **lazygit** is installed automatically by `install.sh` if missing (to `~/.local/bin`)
 - **ripgrep** (`rg`) and **fd** — recommended for `fzf-lua` search
 - A **Nerd Font** in your terminal (for icons)
 
@@ -135,6 +136,7 @@ Leader is `<Space>`.
 | `]c` / `[c`    | Next / previous git hunk        |
 | `<leader>gs`   | Stage hunk                      |
 | `<leader>gp`   | Preview hunk                    |
+| `<leader>gg`   | Open LazyGit (full git TUI)     |
 | `<A-h/j/k/l>`  | Move between windows            |
 | `gt` / `gT`    | Next / previous tab             |
 

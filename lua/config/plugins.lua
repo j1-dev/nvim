@@ -32,6 +32,7 @@ vim.pack.add({
 
   -- Git integration
   'https://github.com/lewis6991/gitsigns.nvim',
+  'https://github.com/kdheepak/lazygit.nvim',
 
   -- File explorer sidebar (VS Code-like tree)
   'https://github.com/nvim-lua/plenary.nvim',
@@ -332,6 +333,9 @@ require('gitsigns').setup({
     gmap('n', '<leader>gb', function() gs.blame_line({ full = true }) end, 'Blame line')
   end,
 })
+
+-- LazyGit: full terminal UI for git (opens in a floating window).
+vim.keymap.set('n', '<leader>gg', '<cmd>LazyGit<CR>', { desc = 'Git: open LazyGit' })
 
 -- ---------------------------------------------------------------------------
 -- File explorer (neo-tree) — VS Code-like sidebar, opens on the RIGHT

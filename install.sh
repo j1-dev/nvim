@@ -46,6 +46,27 @@ install_fzf() {
   rm -rf "$tmp"
 }
 
+# Install the lazygit binary from the official GitHub releases into ~/.local/bin
+# (no sudo, any distro). Used by the lazygit.nvim plugin (<leader>gg).
+install_lazygit() {
+  local asset url tmp
+  case "$(uname -m)" in
+    x86_64|amd64)  asset='linux_x86_64' ;;
+    aarch64|arm64) asset='linux_arm64' ;;
+    armv7l|armhf)  asset='linux_armv6' ;;
+    *) warn "lazygit: unsupported architecture $(uname -m)"; return 1 ;;
+  esac
+  url="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest \
+        | grep -oE "https://[^\"]*lazygit_[0-9.]+_${asset}\.tar\.gz" | head -n1)"
+  [ -n "$url" ] || { warn "lazygit: could not find a release for $asset"; return 1; }
+  tmp="$(mktemp -d)"
+  curl -fsSL "$url" -o "$tmp/lazygit.tar.gz" || { rm -rf "$tmp"; return 1; }
+  tar -xzf "$tmp/lazygit.tar.gz" -C "$tmp" lazygit || { rm -rf "$tmp"; return 1; }
+  mkdir -p "$HOME/.local/bin"
+  install -m 0755 "$tmp/lazygit" "$HOME/.local/bin/lazygit"
+  rm -rf "$tmp"
+}
+
 # Parse flags (order-independent)
 WANT_CLEAN=0
 WANT_NEOVIM=0
@@ -112,6 +133,21 @@ else
     command -v fzf >/dev/null 2>&1 || warn "Add ~/.local/bin to your PATH (e.g. in ~/.bashrc or ~/.zshrc)"
   else
     warn "Could not auto-install fzf. Install it manually: https://github.com/junegunn/fzf"
+  fi
+fi
+
+# lazygit is required by the lazygit.nvim plugin (<leader>gg). Auto-install if missing.
+if command -v lazygit >/dev/null 2>&1; then
+  ok "lazygit"
+elif [ -x "$HOME/.local/bin/lazygit" ]; then
+  ok "lazygit (~/.local/bin/lazygit)"
+else
+  bold "lazygit not found — installing to ~/.local/bin..."
+  if install_lazygit; then
+    ok "lazygit installed ($("$HOME/.local/bin/lazygit" --version 2>/dev/null | grep -oE 'version=[^,]+' | head -n1))"
+    command -v lazygit >/dev/null 2>&1 || warn "Add ~/.local/bin to your PATH (e.g. in ~/.bashrc or ~/.zshrc)"
+  else
+    warn "Could not auto-install lazygit. Install it manually: https://github.com/jesseduffield/lazygit"
   fi
 fi
 
