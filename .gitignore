@@ -1,0 +1,6 @@
+# Backup of previous config
+init.lua.bak
+
+# OS / editor junk
+.DS_Store
+*.swp

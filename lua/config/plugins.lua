@@ -1,0 +1,203 @@
+-- Plugin installation and configuration
+-- Uses Neovim's built-in plugin manager `vim.pack` (see `:h vim.pack`).
+-- Versions are pinned in nvim-pack-lock.json so installs are reproducible.
+
+-- Disable search highlight automatically after a moment / on insert
+vim.cmd('packadd! nohlsearch')
+
+vim.pack.add({
+  -- LSP configs (provides server defaults consumed by vim.lsp.enable)
+  'https://github.com/neovim/nvim-lspconfig',
+
+  -- Install LSP servers / formatters / linters from inside Neovim
+  'https://github.com/mason-org/mason.nvim',
+  'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim',
+
+  -- Syntax highlighting & more (Treesitter). Pinned to the stable `master`
+  -- branch, which compiles parsers with a C compiler (gcc) — no extra CLI needed.
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'master' },
+
+  -- Formatting (Prettier / Prettierd, etc.)
+  'https://github.com/stevearc/conform.nvim',
+
+  -- Fuzzy finder
+  'https://github.com/ibhagwan/fzf-lua',
+
+  -- Autocompletion
+  'https://github.com/nvim-mini/mini.completion',
+
+  -- Enhanced quickfix/loclist
+  'https://github.com/stevearc/quicker.nvim',
+
+  -- Git integration
+  'https://github.com/lewis6991/gitsigns.nvim',
+
+  -- A pleasant colorscheme
+  'https://github.com/folke/tokyonight.nvim',
+})
+
+-- ---------------------------------------------------------------------------
+-- Colorscheme
+-- ---------------------------------------------------------------------------
+vim.cmd.colorscheme('tokyonight-night')
+
+-- ---------------------------------------------------------------------------
+-- Mason: tool manager + auto-install our toolchain
+-- ---------------------------------------------------------------------------
+require('mason').setup()
+require('mason-tool-installer').setup({
+  ensure_installed = {
+    -- LSP servers
+    'typescript-language-server', -- ts_ls
+    'eslint-lsp',                 -- eslint
+    'json-lsp',                   -- jsonls
+    'lua-language-server',        -- lua_ls (for editing this config)
+    -- Formatters
+    'prettierd',
+    'prettier',
+    'stylua',
+  },
+})
+
+-- ---------------------------------------------------------------------------
+-- LSP (Neovim 0.11+ native API: vim.lsp.config / vim.lsp.enable)
+-- nvim-lspconfig ships the per-server defaults under its `lsp/` directory.
+-- ---------------------------------------------------------------------------
+
+-- Diagnostics appearance
+vim.diagnostic.config({
+  virtual_text = { prefix = '●' },
+  severity_sort = true,
+  float = { border = 'rounded', source = true },
+})
+
+-- Per-buffer LSP keymaps, attached only when a server is active.
+vim.api.nvim_create_autocmd('LspAttach', {
+  desc = 'LSP keymaps',
+  callback = function(args)
+    local buf = args.buf
+    local function bmap(keys, fn, desc)
+      vim.keymap.set('n', keys, fn, { buffer = buf, desc = 'LSP: ' .. desc })
+    end
+
+    bmap('grn', vim.lsp.buf.rename, 'Rename symbol')
+    bmap('gra', vim.lsp.buf.code_action, 'Code action')
+    bmap('grr', '<cmd>FzfLua lsp_references<CR>', 'References')
+    bmap('grd', '<cmd>FzfLua lsp_definitions<CR>', 'Go to definition')
+    bmap('gri', '<cmd>FzfLua lsp_implementations<CR>', 'Go to implementation')
+    bmap('grt', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
+    bmap('gO', '<cmd>FzfLua lsp_document_symbols<CR>', 'Document symbols')
+    bmap('K', vim.lsp.buf.hover, 'Hover docs')
+    bmap('<leader>D', vim.lsp.buf.declaration, 'Go to declaration')
+
+    -- Inlay hints toggle (if the server supports it)
+    if vim.lsp.inlay_hint then
+      bmap('<leader>th', function()
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = buf }), { bufnr = buf })
+      end, 'Toggle inlay hints')
+    end
+  end,
+})
+
+-- Enable the servers (configs come from nvim-lspconfig). Tools are installed by Mason above.
+vim.lsp.enable({ 'ts_ls', 'eslint', 'jsonls', 'lua_ls' })
+
+-- ---------------------------------------------------------------------------
+-- Treesitter (better syntax highlighting, indentation, etc.)
+-- ---------------------------------------------------------------------------
+require('nvim-treesitter.configs').setup({
+  ensure_installed = {
+    'typescript', 'javascript', 'tsx', 'json', 'jsonc',
+    'lua', 'vim', 'vimdoc', 'bash', 'markdown', 'markdown_inline',
+    'html', 'css', 'yaml', 'toml', 'dockerfile', 'sql', 'gitcommit',
+  },
+  auto_install = true, -- install missing parsers when opening a new filetype
+  highlight = { enable = true },
+  indent = { enable = true },
+})
+
+-- ---------------------------------------------------------------------------
+-- Formatting (conform.nvim) — format on save with Prettier for web/TS files
+-- ---------------------------------------------------------------------------
+require('conform').setup({
+  formatters_by_ft = {
+    javascript = { 'prettierd', 'prettier', stop_after_first = true },
+    javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+    typescript = { 'prettierd', 'prettier', stop_after_first = true },
+    typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+    json = { 'prettierd', 'prettier', stop_after_first = true },
+    jsonc = { 'prettierd', 'prettier', stop_after_first = true },
+    yaml = { 'prettierd', 'prettier', stop_after_first = true },
+    html = { 'prettierd', 'prettier', stop_after_first = true },
+    css = { 'prettierd', 'prettier', stop_after_first = true },
+    markdown = { 'prettierd', 'prettier', stop_after_first = true },
+    lua = { 'stylua' },
+  },
+  format_on_save = function(bufnr)
+    -- Allow disabling via :FormatDisable (see command below)
+    if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+      return
+    end
+    return { timeout_ms = 1000, lsp_format = 'fallback' }
+  end,
+})
+
+vim.keymap.set({ 'n', 'v' }, '<leader>f', function()
+  require('conform').format({ async = true, lsp_format = 'fallback' })
+end, { desc = 'Format buffer/selection' })
+
+vim.api.nvim_create_user_command('FormatDisable', function(args)
+  if args.bang then
+    vim.b.disable_autoformat = true -- buffer-local
+  else
+    vim.g.disable_autoformat = true -- global
+  end
+end, { desc = 'Disable autoformat-on-save', bang = true })
+
+vim.api.nvim_create_user_command('FormatEnable', function()
+  vim.b.disable_autoformat = false
+  vim.g.disable_autoformat = false
+end, { desc = 'Re-enable autoformat-on-save' })
+
+-- ---------------------------------------------------------------------------
+-- Fuzzy finder (fzf-lua) + keymaps
+-- ---------------------------------------------------------------------------
+require('fzf-lua').setup({ fzf_colors = true })
+
+local fzf = require('fzf-lua')
+vim.keymap.set('n', '<leader>ff', fzf.files, { desc = 'Find files' })
+vim.keymap.set('n', '<leader>fg', fzf.live_grep, { desc = 'Live grep (project search)' })
+vim.keymap.set('n', '<leader>fb', fzf.buffers, { desc = 'Find buffers' })
+vim.keymap.set('n', '<leader>fh', fzf.helptags, { desc = 'Find help' })
+vim.keymap.set('n', '<leader>fr', fzf.resume, { desc = 'Resume last picker' })
+vim.keymap.set('n', '<leader>fd', fzf.diagnostics_document, { desc = 'Document diagnostics' })
+vim.keymap.set('n', '<leader>/', fzf.blines, { desc = 'Search in current buffer' })
+vim.keymap.set('n', '<leader><leader>', fzf.files, { desc = 'Find files (quick)' })
+
+-- ---------------------------------------------------------------------------
+-- Completion (mini.completion) — LSP-aware autocomplete
+-- ---------------------------------------------------------------------------
+require('mini.completion').setup({})
+
+-- ---------------------------------------------------------------------------
+-- Quickfix improvements
+-- ---------------------------------------------------------------------------
+require('quicker').setup({})
+
+-- ---------------------------------------------------------------------------
+-- Git signs in the gutter + hunk navigation
+-- ---------------------------------------------------------------------------
+require('gitsigns').setup({
+  on_attach = function(bufnr)
+    local gs = require('gitsigns')
+    local function gmap(mode, l, r, desc)
+      vim.keymap.set(mode, l, r, { buffer = bufnr, desc = 'Git: ' .. desc })
+    end
+    gmap('n', ']c', function() gs.nav_hunk('next') end, 'Next hunk')
+    gmap('n', '[c', function() gs.nav_hunk('prev') end, 'Prev hunk')
+    gmap('n', '<leader>gs', gs.stage_hunk, 'Stage hunk')
+    gmap('n', '<leader>gr', gs.reset_hunk, 'Reset hunk')
+    gmap('n', '<leader>gp', gs.preview_hunk, 'Preview hunk')
+    gmap('n', '<leader>gb', function() gs.blame_line({ full = true }) end, 'Blame line')
+  end,
+})
