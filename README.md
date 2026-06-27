@@ -24,7 +24,8 @@ auto-install on first launch.
 
 On any machine you install this on, you need:
 
-- **Neovim ≥ 0.11** (0.12 recommended)
+- **Neovim ≥ 0.11** (0.12 recommended). Distro packages are often too old
+  (e.g. Ubuntu ships 0.9) — use `./install-neovim.sh` to get the latest, see below.
 - **git**
 - **Node.js + npm** (for the TypeScript server, Prettier, ESLint)
 - **gcc/clang + make** (compiler toolchain for building Treesitter parsers)
@@ -34,21 +35,56 @@ On any machine you install this on, you need:
 
 ## Install
 
+### Neovim too old (Ubuntu/Debian/etc.)?
+
+Many distros package an outdated Neovim. This installs the **latest stable**
+release straight from the official GitHub (prebuilt, no compiling, any distro):
+
+```sh
+~/.config/nvim/install-neovim.sh            # installs to ~/.local (no sudo)
+# or:
+~/.config/nvim/install-neovim.sh --system   # installs to /usr/local (sudo)
+```
+
+For a `~/.local` install, ensure `~/.local/bin` is on your `PATH`:
+```sh
+export PATH="$HOME/.local/bin:$PATH"   # add to ~/.bashrc or ~/.zshrc
+```
+
 Back up any existing config, then clone this repo into place:
 
 ```sh
 # Linux / macOS
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null || true
 git clone <YOUR_REPO_URL> ~/.config/nvim
-nvim
+~/.config/nvim/install.sh   # checks deps, installs plugins + tools + parsers
 ```
 
-First launch will:
+Or, if your distro's Neovim is too old, do it all in one shot (installs the
+latest Neovim from GitHub first, then everything else):
+
+```sh
+~/.config/nvim/install.sh --neovim
+```
+
+Or just run `nvim` and let it bootstrap on first launch.
+
+First launch / `install.sh` will:
 1. Download all plugins (pinned to versions in `nvim-pack-lock.json`)
-2. Install LSP servers / formatters via Mason
+2. Install LSP servers / formatters / the `tree-sitter` CLI via Mason
 3. Compile Treesitter parsers
 
 Give it a minute. Quit and reopen once it finishes.
+
+### Something failed / partial install?
+
+If plugins half-installed (e.g. fzf or neo-tree missing), do a clean reinstall.
+This wipes only the **downloaded data** (plugins, Mason tools, parsers) and
+rebuilds from the pinned lock file — your config and code are untouched:
+
+```sh
+~/.config/nvim/install.sh --clean
+```
 
 ## Updating
 
