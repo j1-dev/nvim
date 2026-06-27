@@ -35,6 +35,7 @@ On any machine you install this on, you need:
 - **Node.js + npm** (for the TypeScript server, Prettier, ESLint)
 - **gcc/clang + make** (compiler toolchain for building Treesitter parsers)
 - The `tree-sitter` CLI is installed automatically via Mason (no manual step)
+- **fzf** is installed automatically by `install.sh` if missing (to `~/.local/bin`)
 - **ripgrep** (`rg`) and **fd** — recommended for `fzf-lua` search
 - A **Nerd Font** in your terminal (for icons)
 

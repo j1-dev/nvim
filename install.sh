@@ -25,6 +25,27 @@ warn() { printf '  \033[33m!\033[0m %s\n' "$1"; }
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Install the fzf binary from the official GitHub releases into ~/.local/bin
+# (no sudo, any distro). fzf is required by the fuzzy finder (fzf-lua).
+install_fzf() {
+  local asset url tmp
+  case "$(uname -m)" in
+    x86_64|amd64)  asset='linux_amd64' ;;
+    aarch64|arm64) asset='linux_arm64' ;;
+    armv7l|armhf)  asset='linux_armv7' ;;
+    *) warn "fzf: unsupported architecture $(uname -m)"; return 1 ;;
+  esac
+  url="$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/latest \
+        | grep -oE "https://[^\"]*fzf-[0-9.]+-${asset}\.tar\.gz" | head -n1)"
+  [ -n "$url" ] || { warn "fzf: could not find a release for $asset"; return 1; }
+  tmp="$(mktemp -d)"
+  curl -fsSL "$url" -o "$tmp/fzf.tar.gz" || { rm -rf "$tmp"; return 1; }
+  tar -xzf "$tmp/fzf.tar.gz" -C "$tmp" || { rm -rf "$tmp"; return 1; }
+  mkdir -p "$HOME/.local/bin"
+  install -m 0755 "$tmp/fzf" "$HOME/.local/bin/fzf"
+  rm -rf "$tmp"
+}
+
 # Parse flags (order-independent)
 WANT_CLEAN=0
 WANT_NEOVIM=0
@@ -78,6 +99,21 @@ check cc   "C compiler (or install gcc/clang) for Treesitter" || true
 check make "make (Treesitter parsers)"
 check rg   "ripgrep (recommended for fzf search)"
 check fd   "fd (recommended for fzf file search)"
+
+# fzf is required by the fuzzy finder (fzf-lua). Auto-install if missing.
+if command -v fzf >/dev/null 2>&1; then
+  ok "fzf"
+elif [ -x "$HOME/.local/bin/fzf" ]; then
+  ok "fzf (~/.local/bin/fzf)"
+else
+  bold "fzf not found — installing to ~/.local/bin..."
+  if install_fzf; then
+    ok "fzf installed ($("$HOME/.local/bin/fzf" --version 2>/dev/null | awk '{print $1}'))"
+    command -v fzf >/dev/null 2>&1 || warn "Add ~/.local/bin to your PATH (e.g. in ~/.bashrc or ~/.zshrc)"
+  else
+    warn "Could not auto-install fzf. Install it manually: https://github.com/junegunn/fzf"
+  fi
+fi
 
 if [ "$missing" -ne 0 ]; then
   warn "Some tools are missing. Install them, then re-run this script."
