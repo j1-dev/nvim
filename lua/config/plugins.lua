@@ -201,3 +201,31 @@ require('gitsigns').setup({
     gmap('n', '<leader>gb', function() gs.blame_line({ full = true }) end, 'Blame line')
   end,
 })
+
+-- ---------------------------------------------------------------------------
+-- File explorer (neo-tree) — VS Code-like sidebar, opens on the RIGHT
+-- ---------------------------------------------------------------------------
+require('neo-tree').setup({
+  close_if_last_window = true, -- close Neovim if neo-tree is the last window
+  window = {
+    position = 'right',
+    width = 34,
+    mappings = {
+      ['<space>'] = 'none', -- don't hijack leader inside the tree
+    },
+  },
+  filesystem = {
+    follow_current_file = { enabled = true }, -- highlight the file you're editing
+    use_libuv_file_watcher = true,            -- auto-refresh on external changes
+    filtered_items = {
+      hide_dotfiles = false,
+      hide_gitignored = false,
+    },
+  },
+})
+
+-- Toggle the tree (like VS Code's Ctrl-B). Also reveal current file.
+vim.keymap.set('n', '<C-n>', '<cmd>Neotree toggle right<CR>', { desc = 'Toggle file explorer' })
+vim.keymap.set('n', '<leader>n', '<cmd>Neotree toggle right<CR>', { desc = 'Toggle file explorer' })
+vim.keymap.set('n', '<leader>o', '<cmd>Neotree focus right<CR>', { desc = 'Focus file explorer' })
+vim.keymap.set('n', '<leader>R', '<cmd>Neotree reveal right<CR>', { desc = 'Reveal current file in tree' })

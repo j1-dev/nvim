@@ -14,6 +14,7 @@ auto-install on first launch.
 - **Formatting** with Prettier (`prettierd`/`prettier`) — format on save
 - **Fuzzy finding** with `fzf-lua`
 - **Git** signs + hunk actions via `gitsigns`
+- **File explorer** sidebar (`neo-tree`) on the right — VS Code style
 - **Mason** auto-installs all tooling, **pinned plugin versions** via lock file
 
 ## Requirements
@@ -69,6 +70,8 @@ Leader is `<Space>`.
 | Key            | Action                          |
 |----------------|---------------------------------|
 | `<leader>ff`   | Find files                      |
+| `<C-n>` / `<leader>n` | Toggle file explorer (right) |
+| `<leader>R`    | Reveal current file in tree     |
 | `<leader>fg`   | Live grep (project search)      |
 | `<leader>fb`   | Find buffers                    |
 | `<leader>fr`   | Resume last picker              |
