@@ -32,6 +32,12 @@ vim.pack.add({
   -- Git integration
   'https://github.com/lewis6991/gitsigns.nvim',
 
+  -- File explorer sidebar (VS Code-like tree)
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/MunifTanjim/nui.nvim',
+  'https://github.com/nvim-tree/nvim-web-devicons',
+  'https://github.com/nvim-neo-tree/neo-tree.nvim',
+
   -- A pleasant colorscheme
   'https://github.com/folke/tokyonight.nvim',
 })
