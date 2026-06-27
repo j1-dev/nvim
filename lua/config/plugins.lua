@@ -209,11 +209,7 @@ vim.lsp.enable({ 'ts_ls', 'eslint', 'jsonls', 'lua_ls' })
 -- ---------------------------------------------------------------------------
 -- Treesitter (better syntax highlighting, indentation, etc.) — `main` branch API
 -- ---------------------------------------------------------------------------
-local ts_parsers = {
-  'typescript', 'javascript', 'tsx', 'json',
-  'lua', 'vim', 'vimdoc', 'bash', 'markdown', 'markdown_inline',
-  'html', 'css', 'yaml', 'toml', 'dockerfile', 'sql', 'gitcommit',
-}
+local ts_parsers = require('config.treesitter_parsers')
 
 -- Install/compile parsers (async, no-op if already installed). Needs `tree-sitter`.
 pcall(function()

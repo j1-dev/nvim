@@ -36,7 +36,7 @@ for arg in "$@"; do
   esac
 done
 
-# Neovim version helper: prints major*100+minor (e.g. 0.11 -> 11, 0.9 -> 9)
+# Neovim version helper: prints the minor version (e.g. 0.11 -> 11, 0.9 -> 9)
 nvim_minor() {
   command -v nvim >/dev/null 2>&1 || { echo -1; return; }
   nvim --version 2>/dev/null | head -n1 \
@@ -92,19 +92,39 @@ if [ "$WANT_CLEAN" -eq 1 ]; then
 fi
 
 # --- 3. Bootstrap ------------------------------------------------------------
+# Make Mason's bin dir visible so the `tree-sitter` CLI can be found when
+# compiling parsers (Mason installs it there).
+export PATH="$DATA/mason/bin:$PATH"
+
+LOG="$(mktemp)"
+trap 'rm -f "$LOG"' EXIT
+
+# Step 1: install plugins. vim.pack installs synchronously during startup.
 bold "Installing plugins (from pinned lock file)..."
-nvim --headless "+lua vim.defer_fn(function() vim.cmd('qa') end, 60000)" 2>&1 \
-  | grep -iE "install|error" | tail -n 20 || true
+nvim --headless "+qa" >>"$LOG" 2>&1 || true
+ok "plugins installed"
 
-bold "Installing LSP servers / formatters / tree-sitter CLI via Mason..."
-nvim --headless "+MasonToolsInstall" \
-  "+lua vim.defer_fn(function() vim.cmd('qa') end, 180000)" 2>&1 \
-  | grep -iE "successfully installed|error" | tail -n 20 || true
+# Step 2: Mason tools (LSP servers, formatters, tree-sitter CLI) + parser
+# compilation, sequenced so the tree-sitter CLI exists before parsers build.
+# All the noisy progress output goes to the log; we print clean status below.
+bold "Installing LSP servers / formatters / tree-sitter CLI (Mason)..."
+bold "Compiling Treesitter parsers (this can take a minute)..."
+nvim --headless -c "lua dofile('$HERE/scripts/bootstrap.lua')" >>"$LOG" 2>&1 || true
 
-bold "Compiling Treesitter parsers..."
-nvim --headless "+TSUpdateSync" \
-  "+lua vim.defer_fn(function() vim.cmd('qa') end, 240000)" 2>&1 \
-  | grep -iE "installed|error" | tail -n 20 || true
+# Report based on what actually landed on disk. The `main` branch installs
+# compiled parsers under <data>/site/parser/.
+parser_dir="$DATA/site/parser"
+installed_parsers=0
+if [ -d "$parser_dir" ]; then
+  installed_parsers="$(find "$parser_dir" -maxdepth 1 -name '*.so' 2>/dev/null | wc -l | tr -d ' ')"
+fi
+if [ "${installed_parsers:-0}" -gt 0 ]; then
+  ok "Mason tools installed"
+  ok "$installed_parsers Treesitter parsers compiled"
+else
+  warn "No Treesitter parsers were compiled. Check that 'cc'/'make' work, then re-run."
+  tr '\r' '\n' < "$LOG" | grep -iE 'error' | grep -vi 'tree-sitter build' | tail -n 10
+fi
 
 bold "Done."
 echo "Open Neovim normally (\`nvim\`). If anything still looks off, run:"
