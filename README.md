@@ -10,11 +10,14 @@ auto-install on first launch.
 
 - **LSP** for TypeScript/JavaScript (`ts_ls`), ESLint, JSON, and Lua
 - **Autocompletion** via `mini.completion` (LSP-aware)
-- **Treesitter** syntax highlighting & indentation
+- **Treesitter** syntax highlighting & indentation (nvim-treesitter `main` branch)
 - **Formatting** with Prettier (`prettierd`/`prettier`) — format on save
 - **Fuzzy finding** with `fzf-lua`
 - **Git** signs + hunk actions via `gitsigns`
 - **File explorer** sidebar (`neo-tree`) on the right — VS Code style
+- **Integrated terminal** (`toggleterm`) — toggle a shell with `<C-\>`
+- **Custom start screen** (`alpha-nvim`) with a "J" splash + quick actions
+- **Catppuccin (mocha)** colorscheme with a readable terminal palette
 - **Mason** auto-installs all tooling, **pinned plugin versions** via lock file
 
 ## Requirements
@@ -24,7 +27,8 @@ On any machine you install this on, you need:
 - **Neovim ≥ 0.11** (0.12 recommended)
 - **git**
 - **Node.js + npm** (for the TypeScript server, Prettier, ESLint)
-- **gcc/clang + make** (to compile Treesitter parsers)
+- **gcc/clang + make** (compiler toolchain for building Treesitter parsers)
+- The `tree-sitter` CLI is installed automatically via Mason (no manual step)
 - **ripgrep** (`rg`) and **fd** — recommended for `fzf-lua` search
 - A **Nerd Font** in your terminal (for icons)
 
@@ -89,5 +93,42 @@ Leader is `<Space>`.
 | `<leader>gs`   | Stage hunk                      |
 | `<leader>gp`   | Preview hunk                    |
 | `<A-h/j/k/l>`  | Move between windows            |
+| `gt` / `gT`    | Next / previous tab             |
 
 Use `:FormatDisable` / `:FormatEnable` to toggle format-on-save.
+
+## File explorer (neo-tree)
+
+Toggle the tree with `<C-n>` or `<leader>n`. With the cursor on a file/folder
+in the tree:
+
+| Key       | Action                                                   |
+|-----------|----------------------------------------------------------|
+| `<Enter>` | Open in the current window                               |
+| `s`       | Open in a **vertical split** (side-by-side, next to current file) |
+| `S`       | Open in a horizontal split (above/below)                 |
+| `t`       | Open in a **new tab**                                    |
+| `q`       | Close the tree                                           |
+
+After opening: move between split windows with `<A-h/j/k/l>` (or `<C-w>h/j/k/l`),
+and between tabs with `gt` / `gT` (or `<num>gt` to jump to tab N).
+
+## Integrated terminal (toggleterm)
+
+Run git, terraform, npm, etc. without leaving Neovim.
+
+| Key          | Action                                |
+|--------------|---------------------------------------|
+| `<C-\>`      | Toggle terminal (horizontal panel)    |
+| `<leader>tf` | Open a floating terminal              |
+| `<leader>tv` | Open a vertical (side) terminal       |
+| `<leader>tt` | Open a terminal in a new tab          |
+| `<Esc>`      | Leave terminal (insert) mode          |
+| `<A-h/j/k/l>`| Jump from the terminal to other windows |
+
+Inside the terminal, type commands normally. Press `<C-\>` again to hide it.
+You can open numbered terminals too: `2<C-\>` opens/toggles terminal #2, etc.
+
+The terminal opens at the **git project root** of the file you're editing
+(falling back to the current working directory if it's not a git repo), so it
+stays aligned with the folder shown in neo-tree.
