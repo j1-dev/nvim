@@ -138,7 +138,7 @@ Leader is `<Space>`.
 | `<leader>gs`   | Stage hunk                      |
 | `<leader>gp`   | Preview hunk                    |
 | `<leader>gg`   | Open LazyGit (full git TUI)     |
-| `<A-h/j/k/l>`  | Move between windows            |
+| `<C-h/j/k/l>`  | Move between windows            |
 | `gt` / `gT`    | Next / previous tab             |
 
 Use `:FormatDisable` / `:FormatEnable` to toggle format-on-save.
@@ -186,7 +186,7 @@ Run git, terraform, npm, etc. without leaving Neovim.
 | `<leader>tv` | Open a vertical (side) terminal       |
 | `<leader>tt` | Open a terminal in a new tab          |
 | `<Esc>`      | Leave terminal (insert) mode          |
-| `<A-h/j/k/l>`| Jump from the terminal to other windows |
+| `<C-h/j/k/l>`| Jump from the terminal to other windows |
 
 Inside the terminal, type commands normally. Press `<C-\>` again to hide it.
 You can open numbered terminals too: `2<C-\>` opens/toggles terminal #2, etc.
