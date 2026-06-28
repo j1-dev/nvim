@@ -27,6 +27,9 @@ vim.pack.add({
 	-- Autocompletion
 	"https://github.com/nvim-mini/mini.completion",
 
+  -- Auto-close brackets, parens, quotes, etc.
+  "https://github.com/windwp/nvim-autopairs",
+
 	-- Enhanced quickfix/loclist
 	"https://github.com/stevearc/quicker.nvim",
 
@@ -313,6 +316,18 @@ vim.keymap.set("n", "<leader><leader>", fzf.files, { desc = "Find files (quick)"
 -- Completion (mini.completion) — LSP-aware autocomplete
 -- ---------------------------------------------------------------------------
 require("mini.completion").setup({})
+
+-- ---------------------------------------------------------------------------
+-- Auto-pairs: auto-close (), [], {}, "", '', ``, etc.
+-- ---------------------------------------------------------------------------
+require('nvim-autopairs').setup({
+  check_ts = true,        -- use Treesitter to avoid pairing inside strings/comments
+  ts_config = {
+    lua  = { 'string' },  -- don't pair inside lua strings
+    javascript = { 'template_string' },
+    typescript = { 'template_string' },
+  },
+})
 
 -- ---------------------------------------------------------------------------
 -- Quickfix improvements
