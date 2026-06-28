@@ -8,10 +8,10 @@
 --   lua/config/plugins.lua   plugins (vim.pack) + LSP/TS tooling
 
 -- Leader key MUST be set before plugins load. See `:h mapleader`.
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
-require('config.options')
-require('config.keymaps')
-require('config.autocmds')
-require('config.plugins')
+require("config.options")
+require("config.keymaps")
+require("config.autocmds")
+require("config.plugins")
