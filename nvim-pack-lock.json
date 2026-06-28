@@ -64,10 +64,6 @@
       "rev": "7c486f877f25bb44d5f6c058c9f4582acc8520e3",
       "src": "https://github.com/nvim-mini/mini.completion"
     },
-    "neo-tree.nvim": {
-      "rev": "b01ee1769144c4491ea44bc329cb84040e9793be",
-      "src": "https://github.com/nvim-neo-tree/neo-tree.nvim"
-    },
     "neovim": {
       "rev": "ff483051a47e27d84bdef47703538df1ed9f4a47",
       "src": "https://github.com/rose-pine/neovim"
@@ -83,10 +79,6 @@
     "nordic.nvim": {
       "rev": "9fb62116b891184049c50ca6ffb0d3bc100a1a6e",
       "src": "https://github.com/AlexvZyl/nordic.nvim"
-    },
-    "nui.nvim": {
-      "rev": "de740991c12411b663994b2860f1a4fd0937c130",
-      "src": "https://github.com/MunifTanjim/nui.nvim"
     },
     "nvim": {
       "rev": "e068ab5f8261f23f6f71ffd8791ae40315b77b9c",
@@ -140,6 +132,10 @@
     "vscode.nvim": {
       "rev": "aa1102a7e15195c9cca22730b09224a7f7745ba8",
       "src": "https://github.com/Mofiqul/vscode.nvim"
+    },
+    "yazi.nvim": {
+      "rev": "3bc8832ff09534c697ca9846f77fa5647aa189e7",
+      "src": "https://github.com/mikavilpas/yazi.nvim"
     }
   }
 }

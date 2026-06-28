@@ -36,9 +36,10 @@ vim.pack.add({
 
   -- File explorer sidebar (VS Code-like tree)
   'https://github.com/nvim-lua/plenary.nvim',
-  'https://github.com/MunifTanjim/nui.nvim',
   'https://github.com/nvim-tree/nvim-web-devicons',
-  'https://github.com/nvim-neo-tree/neo-tree.nvim',
+
+  -- Yazi file manager integration (replaces neo-tree)
+  'https://github.com/mikavilpas/yazi.nvim',
 
   -- Integrated terminal (toggleable, like VS Code's panel)
   'https://github.com/akinsho/toggleterm.nvim',
@@ -338,32 +339,28 @@ require('gitsigns').setup({
 vim.keymap.set('n', '<leader>gg', '<cmd>LazyGit<CR>', { desc = 'Git: open LazyGit' })
 
 -- ---------------------------------------------------------------------------
--- File explorer (neo-tree) — VS Code-like sidebar, opens on the RIGHT
+-- Yazi: terminal file manager (replaces neo-tree)
 -- ---------------------------------------------------------------------------
-require('neo-tree').setup({
-  close_if_last_window = true, -- close Neovim if neo-tree is the last window
-  window = {
-    position = 'right',
-    width = 34,
-    mappings = {
-      ['<space>'] = 'none', -- don't hijack leader inside the tree
-    },
-  },
-  filesystem = {
-    follow_current_file = { enabled = true }, -- highlight the file you're editing
-    use_libuv_file_watcher = true,            -- auto-refresh on external changes
-    filtered_items = {
-      hide_dotfiles = false,
-      hide_gitignored = false,
-    },
+require('yazi').setup({
+  -- Open yazi instead of netrw when opening a directory
+  open_for_directories = true,
+  -- Use a floating window
+  floating_window_scaling_factor = 0.9,
+  yazi_floating_window_border = 'rounded',
+  keymaps = {
+    open_file_in_vertical_split   = '<C-v>', -- open hovered file in a vertical split
+    open_file_in_horizontal_split = '<C-x>', -- open hovered file in a horizontal split
+    open_file_in_tab              = '<C-t>', -- open hovered file in a new tab
   },
 })
 
--- Toggle the tree (like VS Code's Ctrl-B). Also reveal current file.
-vim.keymap.set('n', '<C-n>', '<cmd>Neotree toggle right<CR>', { desc = 'Toggle file explorer' })
-vim.keymap.set('n', '<leader>n', '<cmd>Neotree toggle right<CR>', { desc = 'Toggle file explorer' })
-vim.keymap.set('n', '<leader>o', '<cmd>Neotree focus right<CR>', { desc = 'Focus file explorer' })
-vim.keymap.set('n', '<leader>R', '<cmd>Neotree reveal right<CR>', { desc = 'Reveal current file in tree' })
+-- <leader>e  open yazi at the current file
+-- <leader>E  open yazi at the cwd (project root)
+-- <leader>R  reveal current file in yazi (same as <leader>e)
+vim.keymap.set('n', '<leader>e', '<cmd>Yazi<CR>',        { desc = 'File manager (current file)' })
+vim.keymap.set('n', '<leader>E', '<cmd>Yazi cwd<CR>',    { desc = 'File manager (cwd)' })
+vim.keymap.set('n', '<C-n>',     '<cmd>Yazi cwd<CR>',    { desc = 'File manager (cwd)' })
+vim.keymap.set('n', '<leader>R', '<cmd>Yazi<CR>',        { desc = 'Reveal current file in yazi' })
 
 -- ---------------------------------------------------------------------------
 -- Integrated terminal (toggleterm) — VS Code-style toggleable terminal

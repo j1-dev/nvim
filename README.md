@@ -14,7 +14,7 @@ auto-install on first launch.
 - **Formatting** with Prettier (`prettierd`/`prettier`) — format on save
 - **Fuzzy finding** with `fzf-lua`
 - **Git** signs + hunk actions via `gitsigns`, plus **LazyGit** full TUI (`<leader>gg`)
-- **File explorer** sidebar (`neo-tree`) on the right — VS Code style
+- **File manager** via `yazi.nvim` — full terminal file manager, floating window
 - **Integrated terminal** (`toggleterm`) — toggle a shell with `<C-\>`
 - **Custom start screen** (`alpha-nvim`) with a "J" splash + quick actions
 - **Catppuccin (mocha)** colorscheme with a readable terminal palette
@@ -37,6 +37,7 @@ On any machine you install this on, you need:
 - The `tree-sitter` CLI is installed automatically via Mason (no manual step)
 - **fzf** is installed automatically by `install.sh` if missing (to `~/.local/bin`)
 - **lazygit** is installed automatically by `install.sh` if missing (to `~/.local/bin`)
+- **yazi** + `ya` are installed automatically by `install.sh` if missing (to `~/.local/bin`)
 - **ripgrep** (`rg`) and **fd** — recommended for `fzf-lua` search
 - A **Nerd Font** in your terminal (for icons)
 
@@ -85,7 +86,7 @@ Give it a minute. Quit and reopen once it finishes.
 
 ### Something failed / partial install?
 
-If plugins half-installed (e.g. fzf or neo-tree missing), do a clean reinstall.
+If plugins half-installed (e.g. fzf or yazi missing), do a clean reinstall.
 This wipes only the **downloaded data** (plugins, Mason tools, parsers) and
 rebuilds from the pinned lock file — your config and code are untouched:
 
@@ -117,8 +118,8 @@ Leader is `<Space>`.
 | Key            | Action                          |
 |----------------|---------------------------------|
 | `<leader>ff`   | Find files                      |
-| `<C-n>` / `<leader>n` | Toggle file explorer (right) |
-| `<leader>R`    | Reveal current file in tree     |
+| `<C-n>` / `<leader>E` | Open file manager (cwd)         |
+| `<leader>e`    | Open file manager (current file) |
 | `<leader>fg`   | Live grep (project search)      |
 | `<leader>fb`   | Find buffers                    |
 | `<leader>fr`   | Resume last picker              |
@@ -142,21 +143,37 @@ Leader is `<Space>`.
 
 Use `:FormatDisable` / `:FormatEnable` to toggle format-on-save.
 
-## File explorer (neo-tree)
+## File manager (yazi)
 
-Toggle the tree with `<C-n>` or `<leader>n`. With the cursor on a file/folder
-in the tree:
+yazi opens as a **floating window** over your editor. It's a full-featured
+terminal file manager: navigate, preview, copy/move/delete, bulk-rename, and
+more.
 
-| Key       | Action                                                   |
-|-----------|----------------------------------------------------------|
-| `<Enter>` | Open in the current window                               |
-| `s`       | Open in a **vertical split** (side-by-side, next to current file) |
-| `S`       | Open in a horizontal split (above/below)                 |
-| `t`       | Open in a **new tab**                                    |
-| `q`       | Close the tree                                           |
+| Key          | Action                                          |
+|--------------|-------------------------------------------------|
+| `<leader>e`  | Open yazi at the **current file**               |
+| `<leader>E`  | Open yazi at the **project root** (cwd)         |
+| `<C-n>`      | Open yazi at the project root (cwd)             |
+| `<leader>R`  | Reveal the current file in yazi                 |
 
-After opening: move between split windows with `<A-h/j/k/l>` (or `<C-w>h/j/k/l`),
-and between tabs with `gt` / `gT` (or `<num>gt` to jump to tab N).
+### Inside yazi
+| Key        | Action                                            |
+|------------|---------------------------------------------------|
+| `h/j/k/l`  | Navigate (left=up a dir, right=open)              |
+| `<Enter>`  | Open file in Neovim (current window)              |
+| `<C-v>`    | Open file in a **vertical split**                 |
+| `<C-x>`    | Open file in a horizontal split                   |
+| `<C-t>`    | Open file in a **new tab**                        |
+| `<Space>`  | Select/deselect file                              |
+| `y` / `x`  | Yank (copy) / cut                                 |
+| `p`        | Paste                                             |
+| `d`        | Move to trash                                     |
+| `a`        | Create file/directory                             |
+| `r`        | Rename                                            |
+| `f`        | Filter (type to search current dir)               |
+| `/`        | Search by name (`fd` under the hood)              |
+| `s`        | Search by content (`rg` under the hood)           |
+| `q` / `<Esc>` | Close yazi, return to Neovim                   |
 
 ## Integrated terminal (toggleterm)
 
@@ -175,5 +192,4 @@ Inside the terminal, type commands normally. Press `<C-\>` again to hide it.
 You can open numbered terminals too: `2<C-\>` opens/toggles terminal #2, etc.
 
 The terminal opens at the **git project root** of the file you're editing
-(falling back to the current working directory if it's not a git repo), so it
-stays aligned with the folder shown in neo-tree.
+(falling back to the current working directory if it's not a git repo).

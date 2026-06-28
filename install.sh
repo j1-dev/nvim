@@ -46,6 +46,28 @@ install_fzf() {
   rm -rf "$tmp"
 }
 
+# Install yazi (terminal file manager) + its companion CLI `ya` into ~/.local/bin.
+# Required by the yazi.nvim plugin (<leader>e / <C-n>).
+install_yazi() {
+  local asset url tmp
+  case "$(uname -m)" in
+    x86_64|amd64)   asset='x86_64-unknown-linux-gnu' ;;
+    aarch64|arm64)  asset='aarch64-unknown-linux-gnu' ;;
+    *) warn "yazi: unsupported architecture $(uname -m)"; return 1 ;;
+  esac
+  url="$(curl -fsSL https://api.github.com/repos/sxyazi/yazi/releases/latest \
+        | grep -oE "https://[^\"]*yazi-${asset}\.zip" | head -n1)"
+  [ -n "$url" ] || { warn "yazi: could not find a release for $asset"; return 1; }
+  tmp="$(mktemp -d)"
+  curl -fsSL "$url" -o "$tmp/yazi.zip" || { rm -rf "$tmp"; return 1; }
+  unzip -q "$tmp/yazi.zip" -d "$tmp" || { rm -rf "$tmp"; return 1; }
+  local extracted; extracted="$(find "$tmp" -maxdepth 1 -type d -name 'yazi-*' | head -n1)"
+  mkdir -p "$HOME/.local/bin"
+  install -m 0755 "$extracted/yazi" "$HOME/.local/bin/yazi"
+  install -m 0755 "$extracted/ya"   "$HOME/.local/bin/ya"
+  rm -rf "$tmp"
+}
+
 # Install the lazygit binary from the official GitHub releases into ~/.local/bin
 # (no sudo, any distro). Used by the lazygit.nvim plugin (<leader>gg).
 install_lazygit() {
@@ -148,6 +170,25 @@ else
     command -v lazygit >/dev/null 2>&1 || warn "Add ~/.local/bin to your PATH (e.g. in ~/.bashrc or ~/.zshrc)"
   else
     warn "Could not auto-install lazygit. Install it manually: https://github.com/jesseduffield/lazygit"
+  fi
+fi
+
+# yazi is the file manager used by yazi.nvim (<leader>e / <C-n>). Auto-install if missing.
+if command -v yazi >/dev/null 2>&1; then
+  ok "yazi"
+elif [ -x "$HOME/.local/bin/yazi" ]; then
+  ok "yazi (~/.local/bin/yazi)"
+else
+  bold "yazi not found — installing to ~/.local/bin..."
+  if command -v unzip >/dev/null 2>&1; then
+    if install_yazi; then
+      ok "yazi installed ($( "$HOME/.local/bin/yazi" --version 2>/dev/null | head -n1 ))"
+      command -v yazi >/dev/null 2>&1 || warn "Add ~/.local/bin to your PATH (e.g. in ~/.bashrc or ~/.zshrc)"
+    else
+      warn "Could not auto-install yazi. Install it manually: https://github.com/sxyazi/yazi"
+    fi
+  else
+    warn "unzip is required to install yazi. Run: sudo apt install unzip (or equivalent)"
   fi
 fi
 
