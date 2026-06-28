@@ -1,5 +1,8 @@
 # nvim-ide
 
+<img width="490" height="268" alt="image" src="https://github.com/user-attachments/assets/bb96444f-f445-4cb1-b170-c36dd4c9e35e" />
+
+
 My personal Neovim configuration — a lightweight TypeScript / backend IDE.
 
 Built on **Neovim 0.12+** using the built-in `vim.pack` plugin manager (no
