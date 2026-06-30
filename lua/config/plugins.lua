@@ -27,8 +27,8 @@ vim.pack.add({
 	-- Autocompletion
 	"https://github.com/nvim-mini/mini.completion",
 
-  -- Auto-close brackets, parens, quotes, etc.
-  "https://github.com/windwp/nvim-autopairs",
+	-- Auto-close brackets, parens, quotes, etc.
+	"https://github.com/windwp/nvim-autopairs",
 
 	-- Enhanced quickfix/loclist
 	"https://github.com/stevearc/quicker.nvim",
@@ -211,7 +211,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- Enable the servers (configs come from nvim-lspconfig). Tools are installed by Mason above.
-vim.lsp.enable({ "ts_ls", "eslint", "jsonls", "lua_ls" })
+vim.lsp.enable({ "ts_ls", "eslint", "jsonls", "lua_ls", "oxlint" })
 
 -- ---------------------------------------------------------------------------
 -- Treesitter (better syntax highlighting, indentation, etc.) — `main` branch API
@@ -320,13 +320,13 @@ require("mini.completion").setup({})
 -- ---------------------------------------------------------------------------
 -- Auto-pairs: auto-close (), [], {}, "", '', ``, etc.
 -- ---------------------------------------------------------------------------
-require('nvim-autopairs').setup({
-  check_ts = true,        -- use Treesitter to avoid pairing inside strings/comments
-  ts_config = {
-    lua  = { 'string' },  -- don't pair inside lua strings
-    javascript = { 'template_string' },
-    typescript = { 'template_string' },
-  },
+require("nvim-autopairs").setup({
+	check_ts = true, -- use Treesitter to avoid pairing inside strings/comments
+	ts_config = {
+		lua = { "string" }, -- don't pair inside lua strings
+		javascript = { "template_string" },
+		typescript = { "template_string" },
+	},
 })
 
 -- ---------------------------------------------------------------------------
